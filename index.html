@@ -11,7 +11,6 @@
 
 <style>
   :root{
-    /* === BLUE + WHITE THEME === */
     --bgA:#071a33;
     --bgB:#f4f8ff;
 
@@ -19,12 +18,10 @@
     --accentSoft:#7fb2ff;
 
     --panel2: rgba(245,248,255,.90);
-    --stroke: rgba(8,40,110,.14);
 
     --text:#0b1c33;
     --muted:#4a5f85;
 
-    /* medals */
     --gold1:#b8860b; --gold2:#ffd700;
     --silver1:#8b8b8b; --silver2:#d7d7d7;
     --bronze1:#7a3d12; --bronze2:#cd7f32;
@@ -204,7 +201,6 @@
     will-change: transform;
   }
 
-  /* hover highlight */
   .rowHover{
     filter: drop-shadow(0 10px 18px rgba(8,40,110,.18));
   }
@@ -318,14 +314,14 @@
     background: rgba(31,102,255,.55);
   }
 
-  /* ===== FLAG (SVG) — рамка и флаг одной формы ===== */
+  /* ===== FLAG: рамка и флаг одной формы ===== */
   .flag{
     width: 78px;
     height: 44px;
 
     --r: 10px;
     border-radius: var(--r);
-    overflow: hidden; /* режет SVG строго по рамке */
+    overflow: hidden;
 
     border: 2px solid rgba(8,40,110,.25);
     background: rgba(255,255,255,.90);
@@ -385,7 +381,6 @@
     letter-spacing: .06em;
   }
 
-  /* medals */
   .gold  .avatar, .gold  .points{ background: linear-gradient(90deg, var(--gold1), var(--gold2)); }
   .silver .avatar, .silver .points{ background: linear-gradient(90deg, var(--silver1), var(--silver2)); }
   .bronze .avatar, .bronze .points{ background: linear-gradient(90deg, var(--bronze1), var(--bronze2)); }
@@ -394,7 +389,6 @@
   .silver .card{ border-color: rgba(140,140,140,.18); }
   .bronze .card{ border-color: rgba(205,127,50,.18); }
 
-  /* animations */
   .fade-in{ animation: fadeIn .28s ease; }
   @keyframes fadeIn{
     from{ opacity:0; transform: translateY(12px); }
@@ -416,8 +410,8 @@
   .tooltip{
     position:absolute;
     z-index:50;
-    min-width: 360px;
-    max-width: min(640px, 92vw);
+    min-width: 520px;
+    max-width: min(840px, 92vw);
     border-radius: 14px;
     background: rgba(245,248,255,.96);
     border: 1px solid rgba(8,40,110,.18);
@@ -452,40 +446,81 @@
     text-overflow:ellipsis;
     white-space:nowrap;
   }
-  .tt-cars{
-    font-weight: 700;
-    color: rgba(11,28,51,.70);
-    letter-spacing:.10em;
-    text-transform: uppercase;
-    font-size: 12px;
-    white-space:nowrap;
-  }
   .tt-body{
     padding: 12px 14px 14px;
   }
-  .tt-grid{
-    display:grid;
-    grid-template-columns: 1fr auto;
-    gap: 8px 12px;
-    align-items:center;
+
+  /* ===== Tooltip table (Race | Place | Track | Car) ===== */
+  .tt-table{
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow:hidden;
+    border-radius: 12px;
+    border: 1px solid rgba(8,40,110,.14);
+    background: rgba(255,255,255,.70);
   }
-  .tt-k{
-    color: rgba(11,28,51,.74);
+
+  .tt-table thead th{
+    text-align:left;
     font-weight: 700;
-    letter-spacing:.08em;
+    letter-spacing: .12em;
     text-transform: uppercase;
     font-size: 12px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    color: rgba(11,28,51,.78);
+    padding: 10px 10px;
+    background: linear-gradient(90deg, rgba(31,102,255,.14), rgba(31,102,255,0));
+    border-bottom: 1px solid rgba(8,40,110,.12);
+    white-space: nowrap;
   }
-  .tt-v{
-    color: rgba(11,28,51,.92);
+
+  .tt-table tbody td{
+    padding: 10px 10px;
+    border-bottom: 1px solid rgba(8,40,110,.10);
     font-weight: 700;
-    font-size: 14px;
-    text-align:right;
-    white-space:nowrap;
+    color: rgba(11,28,51,.92);
+    font-size: 13px;
+    vertical-align: middle;
   }
+
+  .tt-table tbody tr:last-child td{ border-bottom: none; }
+
+  .tt-col-place{ width: 74px; text-align:center; }
+  .tt-col-race{ width: 28%; }
+  .tt-col-track{ width: 32%; }
+  .tt-col-car{ width: auto; }
+
+  .place-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width: 44px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(8,40,110,.14);
+    background: rgba(255,255,255,.65);
+    font-weight: 700;
+    letter-spacing: .06em;
+  }
+  .place-1{
+    background: linear-gradient(90deg, rgba(255,215,0,.95), rgba(184,134,11,.85));
+    border-color: rgba(255,215,0,.35);
+    color: rgba(0,0,0,.88);
+    box-shadow: 0 8px 18px rgba(255,215,0,.18);
+  }
+  .place-2{
+    background: linear-gradient(90deg, rgba(215,215,215,.95), rgba(139,139,139,.85));
+    border-color: rgba(160,160,160,.35);
+    color: rgba(0,0,0,.88);
+    box-shadow: 0 8px 18px rgba(120,120,120,.14);
+  }
+  .place-3{
+    background: linear-gradient(90deg, rgba(205,127,50,.95), rgba(122,61,18,.85));
+    border-color: rgba(205,127,50,.35);
+    color: rgba(0,0,0,.90);
+    box-shadow: 0 8px 18px rgba(205,127,50,.14);
+  }
+
   .tt-empty{
     color: rgba(11,28,51,.60);
     font-weight: 700;
@@ -500,6 +535,7 @@
     .avatar{ width: 62px; height: 62px; border-radius: 10px; }
     .flag{ width: 64px; height: 40px; }
     .tooltip{ min-width: min(380px, 92vw); }
+    .tt-col-track{ display:none; } /* можно убрать на мобиле */
   }
 </style>
 </head>
@@ -530,7 +566,6 @@
     <div class="tooltip" id="tooltip" aria-hidden="true">
       <div class="tt-head">
         <div class="tt-title" id="ttTitle">—</div>
-        <div class="tt-cars" id="ttCars">Машины: —</div>
       </div>
       <div class="tt-body" id="ttBody">
         <div class="tt-empty">Нет данных</div>
@@ -542,8 +577,8 @@
 <script>
   // ================== GOOGLE SHEETS CONFIG ==================
   const PUB_ID  = "2PACX-1vQvwffbzZpdoLI4y1BoWfRvpeE7l4UYSyIoSj9o27T8N7X-7JqI20EYPCv4hUmaZiP81ST1mhkAPiIp";
-  const GID_TOP3     = "748230739";  // таблица: Место / Пилот / Очки
-  const GID_DETAILS  = "986522000";  // таблица: результаты гонок + машины
+  const GID_TOP3     = "748230739";  // Пилот | Очки
+  const GID_DETAILS  = "986522000";  // Пилот | Гонка | Место | Трасса | Машина
   const POLL_MS = 5000;
   // ==========================================================
 
@@ -556,7 +591,6 @@
 
   const tooltipEl = document.getElementById("tooltip");
   const ttTitleEl = document.getElementById("ttTitle");
-  const ttCarsEl  = document.getElementById("ttCars");
   const ttBodyEl  = document.getElementById("ttBody");
 
   // ---- Anti rollback (late responses / parallel calls)
@@ -569,8 +603,8 @@
   let pendingHits = 0;
   const STABLE_HITS = 2;
 
-  // ---- Details cache
-  let detailsMap = new Map(); // lower(name) -> {cars:Set, fields:[{k,v}...]}
+  // ---- Details cache: pilot -> { rows: [{race,place,track,car}] }
+  let detailsMap = new Map();
   let detailsHash = "";
 
   function deepCopy(x){ return JSON.parse(JSON.stringify(x)); }
@@ -686,16 +720,13 @@
     return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
   }
 
-  // ================== DETAILS (gid=986522000) ==================
-  // Supports:
-  // A) wide format: Пилот | Машина | Гонка1 | Гонка2 | ...
-  // B) row format:  Пилот | Гонка | Результат | Машина  (many rows per pilot)
-  function splitCars(text){
-    if (!text) return [];
-    return text
-      .split(/[,;/|]+|\s{2,}/g)
-      .map(s => s.trim())
-      .filter(Boolean);
+  // ================== DETAILS (STRICT TABLE) ==================
+  function pickIndex(headerLowerArr, variants, fallback){
+    for (const v of variants){
+      const i = headerLowerArr.indexOf(v);
+      if (i !== -1) return i;
+    }
+    return fallback;
   }
 
   function buildDetailsMap(matrix){
@@ -705,21 +736,11 @@
     const headerRaw = matrix[0].map(h => (h || "").trim());
     const header = headerRaw.map(norm);
 
-    let idxPilot = header.indexOf("пилот");
-    if (idxPilot === -1) idxPilot = header.indexOf("driver");
-    if (idxPilot === -1) idxPilot = 0;
-
-    let idxCar = header.indexOf("машина");
-    if (idxCar === -1) idxCar = header.indexOf("car");
-
-    let idxRace = header.indexOf("гонка");
-    if (idxRace === -1) idxRace = header.indexOf("race");
-
-    let idxRes  = header.indexOf("результат");
-    if (idxRes === -1) idxRes = header.indexOf("позиция");
-    if (idxRes === -1) idxRes = header.indexOf("result");
-
-    const looksRowStyle = (idxRace !== -1 && idxRes !== -1);
+    const idxPilot = pickIndex(header, ["пилот","driver"], 0);
+    const idxRace  = pickIndex(header, ["гонка","race"], -1);
+    const idxPlace = pickIndex(header, ["место","позиция","результат","place","position","result"], -1);
+    const idxTrack = pickIndex(header, ["трасса","трек","track","circuit"], -1);
+    const idxCar   = pickIndex(header, ["машина","car"], -1);
 
     for (let r=1; r<matrix.length; r++){
       const row = matrix[r] || [];
@@ -727,53 +748,20 @@
       if (!pilot) continue;
       const key = pilot.toLowerCase();
 
-      if (!map.has(key)) map.set(key, { cars: new Set(), fields: [] });
+      if (!map.has(key)) map.set(key, { rows: [] });
       const item = map.get(key);
 
-      if (looksRowStyle){
-        const race = String(row[idxRace] ?? "").trim();
-        const res  = String(row[idxRes] ?? "").trim();
+      const race  = idxRace  !== -1 ? String(row[idxRace]  ?? "").trim() : "";
+      const place = idxPlace !== -1 ? String(row[idxPlace] ?? "").trim() : "";
+      const track = idxTrack !== -1 ? String(row[idxTrack] ?? "").trim() : "";
+      const car   = idxCar   !== -1 ? String(row[idxCar]   ?? "").trim() : "";
 
-        if (idxCar !== -1){
-          const carCell = String(row[idxCar] ?? "").trim();
-          splitCars(carCell).forEach(c => item.cars.add(c));
-        }
-
-        if (race || res){
-          item.fields.push({ k: race || "Гонка", v: res || "—" });
-        } else {
-          for (let c=0; c<headerRaw.length; c++){
-            if (c === idxPilot) continue;
-            const v = String(row[c] ?? "").trim();
-            if (!v) continue;
-            const k = headerRaw[c] || `Колонка ${c+1}`;
-            const kn = norm(k);
-            if (kn.includes("машина") || kn.includes("car")) splitCars(v).forEach(x => item.cars.add(x));
-            else item.fields.push({ k, v });
-          }
-        }
-      } else {
-        if (idxCar !== -1){
-          const carCell = String(row[idxCar] ?? "").trim();
-          splitCars(carCell).forEach(c => item.cars.add(c));
-        }
-
-        for (let c=0; c<headerRaw.length; c++){
-          if (c === idxPilot) continue;
-
-          const kRaw = headerRaw[c] || `Колонка ${c+1}`;
-          const v = String(row[c] ?? "").trim();
-          if (!v) continue;
-
-          const kn = norm(kRaw);
-          if (kn.includes("машина") || kn.includes("car")) splitCars(v).forEach(x => item.cars.add(x));
-          else item.fields.push({ k: kRaw, v });
-        }
-      }
+      if (!race && !place && !track && !car) continue;
+      item.rows.push({ race, place, track, car });
     }
 
     for (const v of map.values()){
-      if (v.fields.length > 14) v.fields = v.fields.slice(0, 14);
+      if (v.rows.length > 20) v.rows = v.rows.slice(0, 20);
     }
     return map;
   }
@@ -796,7 +784,7 @@
     }
   }
 
-  // ================== TOOLTIP ==================
+  // ================== TOOLTIP (STRICT TABLE) ==================
   let tooltipPinned = false;
 
   function escapeHTML(s){
@@ -805,32 +793,52 @@
     }[ch]));
   }
 
+  function parsePlace(v){
+    const n = parseInt(String(v || "").replace(/[^\d]/g,""), 10);
+    return Number.isFinite(n) ? n : null;
+  }
+
   function renderTooltipForName(name){
     const key = (name || "").toLowerCase();
     const d = detailsMap.get(key);
 
     ttTitleEl.textContent = name || "—";
 
-    if (!d){
-      ttCarsEl.textContent = "Машины: —";
-      ttBodyEl.innerHTML = `<div class="tt-empty">Нет данных в листе деталей</div>`;
+    if (!d || !d.rows || !d.rows.length){
+      ttBodyEl.innerHTML = `<div class="tt-empty">Нет данных (лист деталей)</div>`;
       return;
     }
 
-    const cars = [...d.cars.values()];
-    ttCarsEl.textContent = "Машины: " + (cars.length ? cars.join(", ") : "—");
+    const rowsHtml = d.rows.map(r => {
+      const p = parsePlace(r.place);
+      const cls = (p === 1 ? "place-1" : (p === 2 ? "place-2" : (p === 3 ? "place-3" : "")));
+      const pill = `<span class="place-pill ${cls}">${escapeHTML(r.place || "—")}</span>`;
 
-    if (!d.fields.length){
-      ttBodyEl.innerHTML = `<div class="tt-empty">Нет результатов гонок</div>`;
-      return;
-    }
+      return `
+        <tr>
+          <td class="tt-col-race">${escapeHTML(r.race || "—")}</td>
+          <td class="tt-col-place">${pill}</td>
+          <td class="tt-col-track">${escapeHTML(r.track || "—")}</td>
+          <td class="tt-col-car">${escapeHTML(r.car || "—")}</td>
+        </tr>
+      `;
+    }).join("");
 
-    const rows = d.fields.map(x => `
-      <div class="tt-k">${escapeHTML(String(x.k))}</div>
-      <div class="tt-v">${escapeHTML(String(x.v))}</div>
-    `).join("");
-
-    ttBodyEl.innerHTML = `<div class="tt-grid">${rows}</div>`;
+    ttBodyEl.innerHTML = `
+      <table class="tt-table" role="table" aria-label="Результаты гонок">
+        <thead>
+          <tr>
+            <th class="tt-col-race">Гонка</th>
+            <th class="tt-col-place">Место</th>
+            <th class="tt-col-track">Трасса</th>
+            <th class="tt-col-car">Машина</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+    `;
   }
 
   function positionTooltipNearRow(rowEl){
@@ -838,10 +846,7 @@
     const rr = rowEl.getBoundingClientRect();
 
     const gap = 10;
-    const maxW = Math.min(640, br.width - 16);
-    tooltipEl.style.maxWidth = maxW + "px";
 
-    // show to measure
     tooltipEl.classList.add("show");
     tooltipEl.style.left = "0px";
     tooltipEl.style.top = "0px";
@@ -886,7 +891,6 @@
     }
   }
 
-  // click empty area to unpin
   boardEl.addEventListener("mousedown", (e) => {
     if (e.target.closest(".row")) return;
     tooltipPinned = false;
@@ -906,7 +910,7 @@
     positionTooltipNearRow(active);
   });
 
-  // ================== FLIP (animated reorder) ==================
+  // ================== FLIP (reorder animation) ==================
   function snapshotRects(){
     const m = new Map();
     [...rowsEl.children].forEach(el => m.set(el.dataset.key, el.getBoundingClientRect()));
@@ -1110,7 +1114,7 @@
   }
 
   // ================== START ==================
-  fetchDetails(); // load details early for hover
+  fetchDetails();
   tickTop3();
   setInterval(tickAll, POLL_MS);
 </script>
