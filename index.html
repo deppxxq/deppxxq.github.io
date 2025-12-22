@@ -182,6 +182,27 @@
     opacity:.9;
     border: 1px solid rgba(8,40,110,.10);
   }
+.place-pill{
+  display:inline-flex;
+  min-width:36px;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+}
+
+.place-1{
+  background:linear-gradient(90deg,#ffd700,#b8860b);
+  color:#000;
+}
+.place-2{
+  background:linear-gradient(90deg,#d7d7d7,#8b8b8b);
+  color:#000;
+}
+.place-3{
+  background:linear-gradient(90deg,#cd7f32,#7a3d12);
+  color:#000;
+}
 
   .rows{
     flex:1;
@@ -730,42 +751,61 @@
   }
 
   function buildDetailsMap(matrix){
-    const map = new Map();
-    if (!matrix || matrix.length < 2) return map;
+  const map = new Map();
+  if (!matrix || matrix.length < 2) return map;
 
-    const headerRaw = matrix[0].map(h => (h || "").trim());
-    const header = headerRaw.map(norm);
+  // первая строка — заголовки (ГП 1, ГП 2…)
+  const header = matrix[0].map(x => (x || "").trim());
 
-    const idxPilot = pickIndex(header, ["пилот","driver"], 0);
-    const idxRace  = pickIndex(header, ["гонка","race"], -1);
-    const idxPlace = pickIndex(header, ["место","позиция","результат","place","position","result"], -1);
-    const idxTrack = pickIndex(header, ["трасса","трек","track","circuit"], -1);
-    const idxCar   = pickIndex(header, ["машина","car"], -1);
+  // ищем строку "Машины" и "Трасса"
+  let carsRow = null;
+  let tracksRow = null;
 
-    for (let r=1; r<matrix.length; r++){
-      const row = matrix[r] || [];
-      const pilot = String(row[idxPilot] ?? "").trim();
-      if (!pilot) continue;
-      const key = pilot.toLowerCase();
-
-      if (!map.has(key)) map.set(key, { rows: [] });
-      const item = map.get(key);
-
-      const race  = idxRace  !== -1 ? String(row[idxRace]  ?? "").trim() : "";
-      const place = idxPlace !== -1 ? String(row[idxPlace] ?? "").trim() : "";
-      const track = idxTrack !== -1 ? String(row[idxTrack] ?? "").trim() : "";
-      const car   = idxCar   !== -1 ? String(row[idxCar]   ?? "").trim() : "";
-
-      if (!race && !place && !track && !car) continue;
-      item.rows.push({ race, place, track, car });
-    }
-
-    for (const v of map.values()){
-      if (v.rows.length > 20) v.rows = v.rows.slice(0, 20);
-    }
-    return map;
+  for (let i = 1; i < matrix.length; i++){
+    const label = String(matrix[i][0] || "").toLowerCase();
+    if (label.includes("машин")) carsRow = matrix[i];
+    if (label.includes("трас"))  tracksRow = matrix[i];
   }
 
+  // основные строки пилотов
+  for (let r = 1; r < matrix.length; r++){
+    const pilot = String(matrix[r][0] || "").trim();
+    if (!pilot) continue;
+
+    const low = pilot.toLowerCase();
+    if (low.includes("машин") || low.includes("трас")) continue;
+
+    const rows = [];
+
+    for (let c = 1; c < header.length; c++){
+      const raceName = header[c];
+      if (!raceName) continue;
+
+      const placeRaw = String(matrix[r][c] || "").trim();
+      if (!placeRaw) continue;
+
+      const place = parseInt(placeRaw, 10);
+      if (![1,2,3].includes(place)) continue;
+
+      const car   = carsRow   ? String(carsRow[c]   || "").trim() : "—";
+      const track = tracksRow ? String(tracksRow[c] || "").trim() : "—";
+
+      rows.push({
+        race: raceName,
+        place,
+        track,
+        car
+      });
+    }
+
+    if (rows.length){
+      map.set(pilot.toLowerCase(), rows);
+    }
+  }
+
+  return map;
+}
+  
   async function fetchDetails(){
     try{
       const url = `${BASE_CSV_DETAIL}&_=${Date.now()}`;
@@ -798,48 +838,52 @@
     return Number.isFinite(n) ? n : null;
   }
 
-  function renderTooltipForName(name){
-    const key = (name || "").toLowerCase();
-    const d = detailsMap.get(key);
+function renderTooltipForName(name){
+  const data = detailsMap.get((name || "").toLowerCase());
 
-    ttTitleEl.textContent = name || "—";
+  ttTitleEl.textContent = name || "—";
+  ttCarsEl.textContent = "";
 
-    if (!d || !d.rows || !d.rows.length){
-      ttBodyEl.innerHTML = `<div class="tt-empty">Нет данных (лист деталей)</div>`;
-      return;
-    }
-
-    const rowsHtml = d.rows.map(r => {
-      const p = parsePlace(r.place);
-      const cls = (p === 1 ? "place-1" : (p === 2 ? "place-2" : (p === 3 ? "place-3" : "")));
-      const pill = `<span class="place-pill ${cls}">${escapeHTML(r.place || "—")}</span>`;
-
-      return `
-        <tr>
-          <td class="tt-col-race">${escapeHTML(r.race || "—")}</td>
-          <td class="tt-col-place">${pill}</td>
-          <td class="tt-col-track">${escapeHTML(r.track || "—")}</td>
-          <td class="tt-col-car">${escapeHTML(r.car || "—")}</td>
-        </tr>
-      `;
-    }).join("");
-
-    ttBodyEl.innerHTML = `
-      <table class="tt-table" role="table" aria-label="Результаты гонок">
-        <thead>
-          <tr>
-            <th class="tt-col-race">Гонка</th>
-            <th class="tt-col-place">Место</th>
-            <th class="tt-col-track">Трасса</th>
-            <th class="tt-col-car">Машина</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
-      </table>
-    `;
+  if (!data || !data.length){
+    ttBodyEl.innerHTML = `<div class="tt-empty">Нет данных</div>`;
+    return;
   }
+
+  const rowsHtml = data.map(r => {
+    const cls =
+      r.place === 1 ? "place-1" :
+      r.place === 2 ? "place-2" :
+      r.place === 3 ? "place-3" : "";
+
+    return `
+      <tr>
+        <td>${escapeHTML(r.race)}</td>
+        <td class="tt-col-place">
+          <span class="place-pill ${cls}">${r.place}</span>
+        </td>
+        <td>${escapeHTML(r.track)}</td>
+        <td>${escapeHTML(r.car)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  ttBodyEl.innerHTML = `
+    <table class="tt-table">
+      <thead>
+        <tr>
+          <th>Гонка</th>
+          <th>Место</th>
+          <th>Трасса</th>
+          <th>Машина</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+  `;
+}
+
 
   function positionTooltipNearRow(rowEl){
     const br = boardEl.getBoundingClientRect();
@@ -1120,3 +1164,4 @@
 </script>
 </body>
 </html>
+
