@@ -275,10 +275,277 @@
 </div>
 
 <script>
-  /* логика та же, что в предыдущем коде:
-     Google Sheets, анти-дёрганье, FLIP, стабилизация —
-     можешь оставить JS без изменений */
+  // ====== ТВОЙ GOOGLE SHEETS (опубликованный) ======
+  const PUB_ID  = "2PACX-1vQvwffbzZpdoLI4y1BoWfRvpeE7l4UYSyIoSj9o27T8N7X-7JqI20EYPCv4hUmaZiP81ST1mhkAPiIp";
+  const GID     = "748230739";
+  const POLL_MS = 5000;
+  // ================================================
+  const BASE_CSV_URL = `https://docs.google.com/spreadsheets/d/e/${PUB_ID}/pub?output=csv&gid=${GID}&single=true`;
+
+  const rowsEl = document.getElementById("rows");
+  const statusEl = document.getElementById("status");
+
+  // ---- защита от “отката” (параллельные запросы / поздние ответы)
+  let inFlight = false;
+  let reqSeq = 0;
+
+  // ---- анти-дребезг (Google publish иногда отдаёт старое/новое попеременно)
+  // применяем изменения только если получили ОДИНАКОВОЕ состояние 2 раза подряд
+  let lastState = null;       // применённое состояние
+  let pendingState = null;    // кандидат
+  let pendingHits = 0;        // сколько раз подряд пришёл тот же кандидат
+  const STABLE_HITS = 2;      // 2 = быстро и стабильно
+
+  function sameState(a, b){
+    if (!a || !b || a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++){
+      if (a[i].name !== b[i].name || a[i].points !== b[i].points || a[i].pos !== b[i].pos) return false;
+    }
+    return true;
+  }
+
+  function deepCopy(x){ return JSON.parse(JSON.stringify(x)); }
+
+  // CSV парсер (кавычки/запятые)
+  function parseCSV(text){
+    const rows = [];
+    let cur = [], cell = "", inQuotes = false;
+
+    for (let i=0; i<text.length; i++){
+      const ch = text[i];
+      const next = text[i+1];
+
+      if (ch === '"'){
+        if (inQuotes && next === '"'){ cell += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (ch === ',' && !inQuotes){
+        cur.push(cell); cell = "";
+      } else if ((ch === '\n' || ch === '\r') && !inQuotes){
+        if (ch === '\r' && next === '\n') i++;
+        cur.push(cell); rows.push(cur);
+        cur = []; cell = "";
+      } else {
+        cell += ch;
+      }
+    }
+    if (cell.length || cur.length){ cur.push(cell); rows.push(cur); }
+    return rows;
+  }
+
+  const norm = s => (s || "").trim().toLowerCase();
+
+  // Берём все строки, сортируем по очкам, берём TOP 3
+  function extractSortedTop3(csvMatrix){
+    if (!csvMatrix.length) return [];
+
+    const header = csvMatrix[0].map(norm);
+    const idxName   = header.indexOf("пилот");
+    const idxPoints = header.indexOf("очки");
+
+    if (idxName === -1 || idxPoints === -1) {
+      throw new Error("Не найдены столбцы: Пилот / Очки");
+    }
+
+    const all = csvMatrix.slice(1)
+      .filter(r => r && r.length)
+      .map(r => ({
+        name: String((r[idxName] ?? "")).trim(),
+        points: Number(String((r[idxPoints] ?? "")).trim().replace(",", ".")) || 0
+      }))
+      .filter(r => r.name.length > 0);
+
+    all.sort((a,b) => b.points - a.points);
+    return all.slice(0,3).map((r, i) => ({ pos: i+1, ...r }));
+  }
+
+  function themeByPos(pos){
+    return pos === 1 ? "gold" : (pos === 2 ? "silver" : "bronze");
+  }
+
+  function initials(name){
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+    return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  }
+
+  // FLIP helpers
+  function snapshotRects(){
+    const m = new Map();
+    [...rowsEl.children].forEach(el => m.set(el.dataset.key, el.getBoundingClientRect()));
+    return m;
+  }
+  function playFLIP(beforeRects){
+    [...rowsEl.children].forEach(el => {
+      const key = el.dataset.key;
+      const after = el.getBoundingClientRect();
+      const before = beforeRects.get(key);
+      if (!before) return;
+
+      const dx = before.left - after.left;
+      const dy = before.top  - after.top;
+      if (!dx && !dy) return;
+
+      el.classList.remove("flip");
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      void el.offsetWidth;
+      el.classList.add("flip");
+      el.style.transform = "";
+    });
+  }
+
+  function makeRow(item){
+    const el = document.createElement("div");
+    el.className = `row ${themeByPos(item.pos)} fade-in`;
+    el.dataset.key = item.name || `empty-${item.pos}`;
+
+    el.innerHTML = `
+      <div class="placeBox">${item.pos}</div>
+
+      <div class="card">
+        <div class="avatar">${initials(item.name || "—")}</div>
+
+        <div class="nameBlock">
+          <div class="name"></div>
+          <div class="meta"><span class="bar"></span><span>Пилот</span></div>
+        </div>
+
+        <div class="flag">—</div>
+      </div>
+
+      <div class="points">
+        <div class="label">Очки</div>
+        <div class="val"></div>
+      </div>
+    `;
+
+    el.querySelector(".name").textContent = item.name || "—";
+    el.querySelector(".val").textContent = Number.isFinite(item.points) ? item.points : 0;
+
+    return el;
+  }
+
+  function bumpPoints(el){
+    const p = el.querySelector(".points");
+    p.classList.remove("bump");
+    void p.offsetWidth;
+    p.classList.add("bump");
+  }
+
+  function renderWithReorder(nextTop3){
+    const before = snapshotRects();
+    const existing = new Map([...rowsEl.children].map(el => [el.dataset.key, el]));
+
+    const frag = document.createDocumentFragment();
+
+    nextTop3.forEach(item => {
+      const key = item.name || `empty-${item.pos}`;
+      let el = existing.get(key);
+
+      if (!el){
+        el = makeRow(item);
+      } else {
+        el.querySelector(".placeBox").textContent = item.pos;
+        el.classList.remove("gold","silver","bronze");
+        el.classList.add(themeByPos(item.pos));
+
+        el.querySelector(".name").textContent = item.name || "—";
+        el.querySelector(".avatar").textContent = initials(item.name || "—");
+
+        const valEl = el.querySelector(".val");
+        const oldPts = Number(valEl.textContent) || 0;
+        if (oldPts !== item.points){
+          valEl.textContent = item.points;
+          bumpPoints(el);
+        }
+      }
+
+      el.dataset.key = key;
+      frag.appendChild(el);
+    });
+
+    rowsEl.innerHTML = "";
+    rowsEl.appendChild(frag);
+    playFLIP(before);
+  }
+
+  // применяем состояние с анимациями
+  function applyState(state){
+    // если вдруг это то же самое — ничего
+    if (sameState(lastState, state)) return;
+
+    lastState = deepCopy(state);
+    statusEl.textContent = "UPDATE";
+    renderWithReorder(state);
+    setTimeout(() => statusEl.textContent = "LIVE", 350);
+  }
+
+  // логика “стабильности” (2 одинаковых ответа подряд)
+  function considerState(next){
+    // если совпало с уже применённым — сброс кандидата
+    if (sameState(lastState, next)){
+      pendingState = null;
+      pendingHits = 0;
+      statusEl.textContent = "LIVE";
+      return;
+    }
+
+    // если кандидат совпал с прошлым кандидатом — увеличиваем счётчик
+    if (sameState(pendingState, next)){
+      pendingHits++;
+    } else {
+      pendingState = deepCopy(next);
+      pendingHits = 1;
+    }
+
+    // применяем, когда стабильно
+    if (pendingHits >= STABLE_HITS){
+      applyState(pendingState);
+      pendingState = null;
+      pendingHits = 0;
+    } else {
+      statusEl.textContent = "WAIT";
+    }
+  }
+
+  async function tick(){
+    // не запускаем второй запрос, пока идёт первый
+    if (inFlight) return;
+    inFlight = true;
+
+    // id запроса: поздние ответы игнорируем
+    const myReq = ++reqSeq;
+
+    try{
+      // cache-busting (уменьшает шанс получить старое из кеша)
+      const url = `${BASE_CSV_URL}&_=${Date.now()}`;
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+
+      // если уже стартовал новый tick — игнорим этот ответ
+      if (myReq !== reqSeq) return;
+
+      const matrix = parseCSV(text.trim());
+      let top3 = extractSortedTop3(matrix);
+      while (top3.length < 3) top3.push({ pos: top3.length+1, name: "—", points: 0 });
+
+      // ✅ ключевой момент: применяем только когда ответ стабилен
+      considerState(top3);
+
+    } catch (e){
+      statusEl.textContent = "ERROR";
+      console.error(e);
+    } finally {
+      // снимаем блокировку только если это всё ещё “последний” запрос
+      if (myReq === reqSeq) inFlight = false;
+    }
+  }
+
+  tick();
+  setInterval(tick, POLL_MS);
 </script>
 </body>
 </html>
+
 
