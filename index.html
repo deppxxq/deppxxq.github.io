@@ -3,24 +3,30 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>F1 Style Top 3</title>
+<title>Личный зачёт — Top 3</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --f1-red:#e10600;
-    --bg0:#050505;
-    --bg2:#2a0000;
-    --card: rgba(10,10,10,.72);
-    --text: rgba(255,255,255,.94);
-    --muted: rgba(255,255,255,.72);
+    --bgA:#0a0a0a;
+    --bgB:#2a0000;
+
+    --orange:#ff7a18;
+    --orange2:#ff9a3d;
+
+    --panel: rgba(18,18,18,.78);
+    --panel2: rgba(28,28,28,.86);
+    --stroke: rgba(255,255,255,.10);
+
+    --text: rgba(255,255,255,.95);
+    --muted: rgba(255,255,255,.70);
 
     --gold1:#b8860b; --gold2:#ffd700;
-    --silver1:#7d7d7d; --silver2:#c0c0c0;
-    --bronze1:#8b4513; --bronze2:#cd7f32;
+    --silver1:#6f6f6f; --silver2:#c9c9c9;
+    --bronze1:#7a3d12; --bronze2:#cd7f32;
   }
 
   *{ box-sizing:border-box; }
@@ -28,21 +34,21 @@
   html, body{
     margin:0; padding:0;
     width:100%; height:100%;
-    color: var(--text);
     overflow:hidden;
-    background:
-      radial-gradient(1200px 800px at 80% 10%, rgba(225,6,0,.25), transparent 55%),
-      radial-gradient(900px 700px at 20% 90%, rgba(225,6,0,.18), transparent 60%),
-      linear-gradient(135deg, var(--bg0), var(--bg2));
     font-family: Rajdhani, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(1100px 700px at 75% 10%, rgba(255,122,24,.20), transparent 55%),
+      radial-gradient(1100px 700px at 10% 85%, rgba(225,6,0,.18), transparent 60%),
+      linear-gradient(135deg, var(--bgA), var(--bgB));
   }
 
   body::before{
     content:"";
     position:fixed; inset:0;
     background:
-      repeating-linear-gradient(45deg, rgba(255,255,255,.035) 0 2px, rgba(0,0,0,0) 2px 10px),
-      repeating-linear-gradient(-45deg, rgba(255,255,255,.02) 0 2px, rgba(0,0,0,0) 2px 12px);
+      repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 2px, rgba(0,0,0,0) 2px 12px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,.02) 0 2px, rgba(0,0,0,0) 2px 14px);
     opacity:.35;
     pointer-events:none;
   }
@@ -53,96 +59,129 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    padding: 3vh 4vw;
+    padding: 2.8vh 3.5vw;
   }
 
   .board{
-    width:100%;
-    height:100%;
-    max-width:1700px;
-    max-height:930px;
-    border-radius:22px;
-    background: linear-gradient(180deg, rgba(10,10,10,.70), rgba(0,0,0,.55));
+    width: min(1500px, 96vw);
+    height: min(920px, 94svh);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(18,18,18,.72), rgba(0,0,0,.50));
     border: 1px solid rgba(255,255,255,.08);
-    box-shadow: 0 0 70px rgba(225,6,0,.28);
+    box-shadow: 0 18px 70px rgba(0,0,0,.55);
     overflow:hidden;
     position:relative;
     backdrop-filter: blur(6px);
   }
 
-  .board::before{
+  .board::after{
     content:"";
-    position:absolute;
-    inset:0;
+    position:absolute; inset:0;
     background:
-      linear-gradient(115deg, transparent 0 62%, rgba(225,6,0,.18) 62% 66%, transparent 66% 100%),
-      linear-gradient(115deg, transparent 0 74%, rgba(225,6,0,.10) 74% 76%, transparent 76% 100%);
+      linear-gradient(115deg, transparent 0 60%, rgba(255,122,24,.16) 60% 64%, transparent 64% 100%),
+      linear-gradient(115deg, transparent 0 74%, rgba(255,122,24,.10) 74% 76%, transparent 76% 100%);
     pointer-events:none;
   }
 
+  .wm{
+    position:absolute;
+    left: 4%;
+    bottom: 2%;
+    font-size: clamp(70px, 11vw, 170px);
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.05);
+    user-select:none;
+    pointer-events:none;
+    z-index:0;
+    transform: skewX(-10deg);
+  }
+
   .header{
-    padding: 22px 26px 14px;
+    position:relative;
+    z-index:2;
+    padding: 22px 24px 14px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
     display:flex;
     align-items:flex-end;
     justify-content:space-between;
-    gap:16px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    position:relative;
-    z-index:1;
+    gap: 16px;
   }
+
+  .titleWrap{ display:flex; flex-direction:column; gap:6px; min-width:0; }
 
   .title{
-    display:flex;
-    align-items:baseline;
-    gap:14px;
-  }
-
-  .f1mark{
-    font-family: Teko, Rajdhani, sans-serif;
-    font-weight:700;
-    font-size: clamp(28px, 3.2vw, 54px);
-    letter-spacing:.08em;
+    font-size: clamp(34px, 4.9vw, 72px);
+    font-weight: 700;
+    letter-spacing: .10em;
     text-transform: uppercase;
-    line-height:1;
+    line-height: 1;
+    color: var(--orange);
+    text-shadow: 0 10px 40px rgba(255,122,24,.18);
   }
-  .f1mark .red{ color: var(--f1-red); }
 
-  .subtitle{
-    font-weight:700;
+  .sub{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing:.16em;
+    text-transform: uppercase;
+    font-size: clamp(14px, 1.5vw, 20px);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .sub .dot{
+    width:10px; height:10px; border-radius:50%;
+    background: var(--orange);
+    box-shadow: 0 0 18px rgba(255,122,24,.45);
+  }
+
+  .stage{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: inset 0 0 18px rgba(255,255,255,.06);
+    white-space:nowrap;
+  }
+  .stage .label{
+    font-weight: 700;
     letter-spacing:.18em;
     text-transform: uppercase;
-    font-size: clamp(14px, 1.4vw, 20px);
-    color: var(--muted);
-    transform: translateY(-3px);
-    white-space:nowrap;
-  }
-
-  .status{
-    font-weight:700;
-    letter-spacing:.12em;
-    text-transform: uppercase;
+    color: rgba(255,255,255,.88);
     font-size: clamp(12px, 1.2vw, 16px);
-    color: var(--muted);
-    white-space:nowrap;
+  }
+  .stage .val{
+    font-weight: 700;
+    letter-spacing:.10em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.78);
+    font-size: clamp(12px, 1.2vw, 16px);
   }
 
   .content{
-    height: calc(100% - 86px);
-    padding: 22px 26px 26px;
+    position:relative;
+    z-index:2;
+    height: calc(100% - 92px);
+    padding: 18px 24px 24px;
     display:flex;
     flex-direction:column;
-    gap: 18px;
-    position:relative;
-    z-index:1;
+    gap: 16px;
   }
 
   .checkline{
     height: 10px;
     border-radius: 999px;
     background:
-      linear-gradient(90deg, rgba(225,6,0,.75), rgba(225,6,0,0)),
+      linear-gradient(90deg, rgba(255,122,24,.85), rgba(255,122,24,0)),
       repeating-linear-gradient(90deg, rgba(255,255,255,.14) 0 10px, rgba(0,0,0,0) 10px 20px);
-    opacity:.75;
+    opacity:.85;
     border: 1px solid rgba(255,255,255,.08);
   }
 
@@ -151,130 +190,185 @@
     display:flex;
     flex-direction:column;
     justify-content:center;
-    gap: 18px;
+    gap: 14px;
     position:relative;
   }
 
   .row{
     height: clamp(92px, 14vh, 150px);
     display:grid;
-    grid-template-columns: 12% 1fr 22%;
-    align-items:center;
-    gap: 18px;
-    padding: 14px 16px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.10);
-    background: rgba(10,10,10,.55);
-    position:relative;
-    overflow:hidden;
+    grid-template-columns: 92px 1fr 160px;
+    gap: 12px;
+    align-items:stretch;
     will-change: transform;
   }
 
-  .row::after{
+  .placeBox{
+    border-radius: 14px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: clamp(28px, 3.2vw, 52px);
+    font-weight: 700;
+    letter-spacing: .05em;
+    position:relative;
+    overflow:hidden;
+  }
+  .placeBox::after{
     content:"";
-    position:absolute;
-    inset:0;
-    background: linear-gradient(115deg, transparent 0 58%, rgba(255,255,255,.06) 58% 60%, transparent 60% 100%);
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(255,255,255,.06), transparent 55%);
     pointer-events:none;
   }
 
-  .row::before{
+  .card{
+    border-radius: 14px;
+    background: var(--panel2);
+    border: 1px solid rgba(255,255,255,.10);
+    position:relative;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns: 86px 1fr 90px;
+    gap: 12px;
+    align-items:center;
+    padding: 12px 14px;
+  }
+
+  .card::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(115deg, transparent 0 66%, rgba(255,255,255,.07) 66% 68%, transparent 68% 100%);
+    pointer-events:none;
+  }
+  .card::before{
     content:"";
     position:absolute;
     inset:-90px -220px;
-    background: radial-gradient(circle at 30% 50%, rgba(255,255,255,.22), transparent 60%);
+    background: radial-gradient(circle at 30% 50%, rgba(255,255,255,.18), transparent 60%);
     animation: sweep 4.2s ease-in-out infinite;
-    opacity:.75;
+    opacity:.85;
     pointer-events:none;
   }
   @keyframes sweep{
     0%{ transform: translateX(-45%) rotate(6deg); }
-    50%{ transform: translateX(8%) rotate(6deg); }
+    50%{ transform: translateX(10%) rotate(6deg); }
     100%{ transform: translateX(-45%) rotate(6deg); }
   }
 
-  .pos{
-    height: 100%;
-    border-radius: 14px;
+  .avatar{
+    width: 74px; height: 74px;
+    border-radius: 12px;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-family: Teko, Rajdhani, sans-serif;
-    font-weight:700;
-    font-size: clamp(40px, 5vw, 76px);
-    letter-spacing:.04em;
+    font-weight: 700;
+    font-size: 26px;
     color: rgba(0,0,0,.9);
     box-shadow: inset 0 0 18px rgba(255,255,255,.18);
     user-select:none;
+    overflow:hidden;
   }
 
-  .pilot{
+  .nameBlock{
+    min-width:0;
     display:flex;
     flex-direction:column;
-    gap: 6px;
-    min-width:0;
+    gap: 8px;
   }
-  .pilot .name{
-    font-weight:700;
-    font-size: clamp(24px, 3.2vw, 52px);
-    line-height: 1.0;
-    text-transform: uppercase;
+
+  .name{
+    font-size: clamp(22px, 3.0vw, 48px);
+    font-weight: 700;
     letter-spacing: .06em;
+    text-transform: uppercase;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-  }
-  .pilot .meta{
-    display:flex;
-    gap: 10px;
-    align-items:center;
-    color: var(--muted);
-    font-weight:700;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    font-size: clamp(12px, 1.25vw, 16px);
-  }
-  .pilot .meta .bar{
-    width: 44px;
-    height: 3px;
-    border-radius: 99px;
-    background: rgba(255,255,255,.20);
+    line-height:1;
   }
 
-  .pts{
-    height: 100%;
+  .meta{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    font-size: clamp(12px, 1.15vw, 16px);
+  }
+  .meta .bar{
+    width: 46px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255,122,24,.65);
+  }
+
+  .flag{
+    width: 78px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight: 700;
+    letter-spacing:.12em;
+    color: rgba(255,255,255,.75);
+    user-select:none;
+  }
+
+  .points{
     border-radius: 14px;
-    padding: 12px 14px;
     display:flex;
     flex-direction:column;
-    justify-content:center;
     align-items:flex-end;
+    justify-content:center;
+    padding: 10px 14px;
     color: rgba(0,0,0,.92);
     box-shadow: inset 0 0 18px rgba(255,255,255,.18);
+    user-select:none;
+    position:relative;
+    overflow:hidden;
   }
-  .pts .label{
-    font-weight:800;
+  .points::after{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(255,255,255,.22), transparent 55%);
+    pointer-events:none;
+    opacity:.55;
+  }
+  .points .label{
+    font-weight: 700;
     letter-spacing: .22em;
     text-transform: uppercase;
-    font-size: clamp(12px, 1.2vw, 16px);
-    opacity:.85;
+    font-size: clamp(11px, 1.05vw, 15px);
+    opacity:.90;
   }
-  .pts .val{
-    font-family: Teko, Rajdhani, sans-serif;
-    font-weight:700;
-    font-size: clamp(34px, 4.2vw, 76px);
-    line-height: .9;
+  .points .val{
+    font-size: clamp(30px, 3.8vw, 72px);
+    font-weight: 700;
+    line-height:.95;
     letter-spacing: .06em;
   }
 
-  .gold{ border-color: rgba(255,215,0,.22); }
-  .gold .pos, .gold .pts{ background: linear-gradient(90deg, var(--gold1), var(--gold2)); }
+  .gold  .avatar, .gold  .points{ background: linear-gradient(90deg, var(--gold1), var(--gold2)); }
+  .silver .avatar, .silver .points{ background: linear-gradient(90deg, var(--silver1), var(--silver2)); }
+  .bronze .avatar, .bronze .points{ background: linear-gradient(90deg, var(--bronze1), var(--bronze2)); }
 
-  .silver{ border-color: rgba(192,192,192,.22); }
-  .silver .pos, .silver .pts{ background: linear-gradient(90deg, var(--silver1), var(--silver2)); }
+  .gold  .card{ border-color: rgba(255,215,0,.18); }
+  .silver .card{ border-color: rgba(192,192,192,.18); }
+  .bronze .card{ border-color: rgba(205,127,50,.18); }
 
-  .bronze{ border-color: rgba(205,127,50,.22); }
-  .bronze .pos, .bronze .pts{ background: linear-gradient(90deg, var(--bronze1), var(--bronze2)); }
+  .fade-in{ animation: fadeIn .28s ease; }
+  @keyframes fadeIn{
+    from{ opacity:0; transform: translateY(12px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
 
   .bump{ animation: bump .38s ease; }
   @keyframes bump{
@@ -287,10 +381,11 @@
     transition: transform 520ms cubic-bezier(.2,.9,.2,1);
   }
 
-  .fade-in{ animation: fadeIn .28s ease; }
-  @keyframes fadeIn{
-    from{ opacity:0; transform: translateY(12px); }
-    to{ opacity:1; transform: translateY(0); }
+  @media (max-width: 760px){
+    .row{ grid-template-columns: 70px 1fr 130px; }
+    .card{ grid-template-columns: 72px 1fr 70px; }
+    .avatar{ width: 62px; height: 62px; border-radius: 10px; }
+    .flag{ width: 64px; height: 40px; }
   }
 </style>
 </head>
@@ -298,12 +393,18 @@
 <body>
 <div class="app">
   <div class="board">
+    <div class="wm">STANDINGS</div>
+
     <div class="header">
-      <div class="title">
-        <div class="f1mark"><span class="red">Forza</span> LEADERBOARD</div>
-        <div class="subtitle">Зачет</div>
+      <div class="titleWrap">
+        <div class="title">ЛИЧНЫЙ ЗАЧЁТ</div>
+        <div class="sub"><span class="dot"></span> Гран-при • Top 3 • Live</div>
       </div>
-      <div class="status" id="status">Подключение…</div>
+
+      <div class="stage">
+        <div class="label">Этап:</div>
+        <div class="val" id="status">подключение…</div>
+      </div>
     </div>
 
     <div class="content">
@@ -319,16 +420,21 @@
   const GID     = "748230739";
   const POLL_MS = 5000;
   // ================================================
-  const CSV_URL = `https://docs.google.com/spreadsheets/d/e/${PUB_ID}/pub?output=csv&gid=${GID}&single=true`;
+  const BASE_CSV_URL = `https://docs.google.com/spreadsheets/d/e/${PUB_ID}/pub?output=csv&gid=${GID}&single=true`;
 
-  const rowsEl   = document.getElementById("rows");
+  const rowsEl = document.getElementById("rows");
   const statusEl = document.getElementById("status");
 
-  // чтобы не "дёргалось" — обновляем DOM только если реально есть изменения
-  let lastState = null;
+  // ---- защита от “отката” (параллельные запросы / поздние ответы)
   let inFlight = false;
   let reqSeq = 0;
 
+  // ---- анти-дребезг (Google publish иногда отдаёт старое/новое попеременно)
+  // применяем изменения только если получили ОДИНАКОВОЕ состояние 2 раза подряд
+  let lastState = null;       // применённое состояние
+  let pendingState = null;    // кандидат
+  let pendingHits = 0;        // сколько раз подряд пришёл тот же кандидат
+  const STABLE_HITS = 2;      // 2 = быстро и стабильно
 
   function sameState(a, b){
     if (!a || !b || a.length !== b.length) return false;
@@ -338,35 +444,7 @@
     return true;
   }
 
-  // FLIP: снимок позиций элементов ДО перестановки
-  function snapshotRects() {
-    const m = new Map();
-    [...rowsEl.children].forEach(el => {
-      m.set(el.dataset.key, el.getBoundingClientRect());
-    });
-    return m;
-  }
-
-  // FLIP: проигрываем анимацию после перестановки DOM
-  function playFLIP(beforeRects) {
-    [...rowsEl.children].forEach(el => {
-      const key = el.dataset.key;
-      const after = el.getBoundingClientRect();
-      const before = beforeRects.get(key);
-      if (!before) return;
-
-      const dx = before.left - after.left;
-      const dy = before.top  - after.top;
-
-      if (dx || dy) {
-        el.classList.remove("flip");
-        el.style.transform = `translate(${dx}px, ${dy}px)`;
-        void el.offsetWidth;
-        el.classList.add("flip");
-        el.style.transform = "";
-      }
-    });
-  }
+  function deepCopy(x){ return JSON.parse(JSON.stringify(x)); }
 
   // CSV парсер (кавычки/запятые)
   function parseCSV(text){
@@ -394,13 +472,13 @@
     return rows;
   }
 
-  function norm(s){ return (s || "").trim().toLowerCase(); }
+  const norm = s => (s || "").trim().toLowerCase();
 
-  // Берём все строки, сортируем по очкам, берём топ-3
+  // Берём все строки, сортируем по очкам, берём TOP 3
   function extractSortedTop3(csvMatrix){
     if (!csvMatrix.length) return [];
-    const header = csvMatrix[0].map(norm);
 
+    const header = csvMatrix[0].map(norm);
     const idxName   = header.indexOf("пилот");
     const idxPoints = header.indexOf("очки");
 
@@ -424,35 +502,75 @@
     return pos === 1 ? "gold" : (pos === 2 ? "silver" : "bronze");
   }
 
+  function initials(name){
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+    return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  }
+
+  // FLIP helpers
+  function snapshotRects(){
+    const m = new Map();
+    [...rowsEl.children].forEach(el => m.set(el.dataset.key, el.getBoundingClientRect()));
+    return m;
+  }
+  function playFLIP(beforeRects){
+    [...rowsEl.children].forEach(el => {
+      const key = el.dataset.key;
+      const after = el.getBoundingClientRect();
+      const before = beforeRects.get(key);
+      if (!before) return;
+
+      const dx = before.left - after.left;
+      const dy = before.top  - after.top;
+      if (!dx && !dy) return;
+
+      el.classList.remove("flip");
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      void el.offsetWidth;
+      el.classList.add("flip");
+      el.style.transform = "";
+    });
+  }
+
   function makeRow(item){
     const el = document.createElement("div");
     el.className = `row ${themeByPos(item.pos)} fade-in`;
-    el.dataset.key = item.name; // ключ для перестановки (имя должно быть уникальным)
+    el.dataset.key = item.name || `empty-${item.pos}`;
 
     el.innerHTML = `
-      <div class="pos">${item.pos}</div>
-      <div class="pilot">
-        <div class="name"></div>
-        <div class="meta"><span class="bar"></span><span>Points</span></div>
+      <div class="placeBox">${item.pos}</div>
+
+      <div class="card">
+        <div class="avatar">${initials(item.name || "—")}</div>
+
+        <div class="nameBlock">
+          <div class="name"></div>
+          <div class="meta"><span class="bar"></span><span>Пилот</span></div>
+        </div>
+
+        <div class="flag">—</div>
       </div>
-      <div class="pts">
+
+      <div class="points">
         <div class="label">Очки</div>
         <div class="val"></div>
       </div>
     `;
-    el.querySelector(".pilot .name").textContent = item.name || "—";
-    el.querySelector(".pts .val").textContent = item.points ?? 0;
+
+    el.querySelector(".name").textContent = item.name || "—";
+    el.querySelector(".val").textContent = Number.isFinite(item.points) ? item.points : 0;
+
     return el;
   }
 
   function bumpPoints(el){
-    const box = el.querySelector(".pts");
-    box.classList.remove("bump");
-    void box.offsetWidth;
-    box.classList.add("bump");
+    const p = el.querySelector(".points");
+    p.classList.remove("bump");
+    void p.offsetWidth;
+    p.classList.add("bump");
   }
 
-  // Перерисовка/перестановка с FLIP-анимацией
   function renderWithReorder(nextTop3){
     const before = snapshotRects();
     const existing = new Map([...rowsEl.children].map(el => [el.dataset.key, el]));
@@ -460,74 +578,109 @@
     const frag = document.createDocumentFragment();
 
     nextTop3.forEach(item => {
-      let el = existing.get(item.name);
+      const key = item.name || `empty-${item.pos}`;
+      let el = existing.get(key);
 
-      if (!el) {
+      if (!el){
         el = makeRow(item);
       } else {
-        el.querySelector(".pos").textContent = item.pos;
+        el.querySelector(".placeBox").textContent = item.pos;
         el.classList.remove("gold","silver","bronze");
         el.classList.add(themeByPos(item.pos));
 
-        const valEl = el.querySelector(".pts .val");
+        el.querySelector(".name").textContent = item.name || "—";
+        el.querySelector(".avatar").textContent = initials(item.name || "—");
+
+        const valEl = el.querySelector(".val");
         const oldPts = Number(valEl.textContent) || 0;
-        if (oldPts !== item.points) {
+        if (oldPts !== item.points){
           valEl.textContent = item.points;
           bumpPoints(el);
         }
       }
 
+      el.dataset.key = key;
       frag.appendChild(el);
     });
 
     rowsEl.innerHTML = "";
     rowsEl.appendChild(frag);
-
     playFLIP(before);
   }
 
-async function tick(){
-  // не запускаем второй запрос, пока идёт первый
-  if (inFlight) return;
-  inFlight = true;
+  // применяем состояние с анимациями
+  function applyState(state){
+    // если вдруг это то же самое — ничего
+    if (sameState(lastState, state)) return;
 
-  // id этого запроса
-  const myReq = ++reqSeq;
+    lastState = deepCopy(state);
+    statusEl.textContent = "UPDATE";
+    renderWithReorder(state);
+    setTimeout(() => statusEl.textContent = "LIVE", 350);
+  }
 
-  try{
-    // cache-busting, чтобы не ловить CDN-кэш Google
-    const url = `${CSV_URL}&_=${Date.now()}`;
-
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-
-    // если пока мы ждали, стартовал новый tick — этот ответ игнорируем
-    if (myReq !== reqSeq) return;
-
-    const matrix = parseCSV(text.trim());
-    let top3 = extractSortedTop3(matrix);
-    while (top3.length < 3) top3.push({ pos: top3.length+1, name: "—", points: 0 });
-
-    // если ничего не изменилось — не трогаем DOM
-    if (sameState(lastState, top3)) {
+  // логика “стабильности” (2 одинаковых ответа подряд)
+  function considerState(next){
+    // если совпало с уже применённым — сброс кандидата
+    if (sameState(lastState, next)){
+      pendingState = null;
+      pendingHits = 0;
       statusEl.textContent = "LIVE";
       return;
     }
 
-    lastState = JSON.parse(JSON.stringify(top3));
-    statusEl.textContent = "UPDATE";
-    renderWithReorder(top3);
-    setTimeout(() => statusEl.textContent = "LIVE", 350);
+    // если кандидат совпал с прошлым кандидатом — увеличиваем счётчик
+    if (sameState(pendingState, next)){
+      pendingHits++;
+    } else {
+      pendingState = deepCopy(next);
+      pendingHits = 1;
+    }
 
-  } catch (e){
-    statusEl.textContent = "ERROR";
-    console.error(e);
-  } finally {
-    // снимаем блокировку только если это всё ещё “последний” запрос
-    if (myReq === reqSeq) inFlight = false;
+    // применяем, когда стабильно
+    if (pendingHits >= STABLE_HITS){
+      applyState(pendingState);
+      pendingState = null;
+      pendingHits = 0;
+    } else {
+      statusEl.textContent = "WAIT";
+    }
   }
-}
+
+  async function tick(){
+    // не запускаем второй запрос, пока идёт первый
+    if (inFlight) return;
+    inFlight = true;
+
+    // id запроса: поздние ответы игнорируем
+    const myReq = ++reqSeq;
+
+    try{
+      // cache-busting (уменьшает шанс получить старое из кеша)
+      const url = `${BASE_CSV_URL}&_=${Date.now()}`;
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+
+      // если уже стартовал новый tick — игнорим этот ответ
+      if (myReq !== reqSeq) return;
+
+      const matrix = parseCSV(text.trim());
+      let top3 = extractSortedTop3(matrix);
+      while (top3.length < 3) top3.push({ pos: top3.length+1, name: "—", points: 0 });
+
+      // ✅ ключевой момент: применяем только когда ответ стабилен
+      considerState(top3);
+
+    } catch (e){
+      statusEl.textContent = "ERROR";
+      console.error(e);
+    } finally {
+      // снимаем блокировку только если это всё ещё “последний” запрос
+      if (myReq === reqSeq) inFlight = false;
+    }
+  }
 
   tick();
   setInterval(tick, POLL_MS);
