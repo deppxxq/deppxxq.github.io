@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Личный зачёт — Top 3</title>
+<title>Личный зачёт — Top 3 (Live)</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,20 +11,20 @@
 
 <style>
   :root{
-    /* === СИНИЙ + БЕЛЫЙ === */
+    /* === BLUE + WHITE THEME === */
     --bgA:#071a33;
     --bgB:#f4f8ff;
+
     --accent:#1f66ff;
     --accentSoft:#7fb2ff;
 
-    --panel: rgba(255,255,255,.78);
     --panel2: rgba(245,248,255,.90);
     --stroke: rgba(8,40,110,.14);
 
     --text:#0b1c33;
     --muted:#4a5f85;
 
-    /* медали */
+    /* medals */
     --gold1:#b8860b; --gold2:#ffd700;
     --silver1:#8b8b8b; --silver2:#d7d7d7;
     --bronze1:#7a3d12; --bronze2:#cd7f32;
@@ -204,7 +204,7 @@
     will-change: transform;
   }
 
-  /* небольшой интерактив на hover */
+  /* hover highlight */
   .rowHover{
     filter: drop-shadow(0 10px 18px rgba(8,40,110,.18));
   }
@@ -253,7 +253,6 @@
     background: linear-gradient(115deg, transparent 0 66%, rgba(31,102,255,.08) 66% 68%, transparent 68% 100%);
     pointer-events:none;
   }
-
   .card::before{
     content:"";
     position:absolute;
@@ -319,25 +318,37 @@
     background: rgba(31,102,255,.55);
   }
 
-  /* SVG-флаг */
+  /* ===== FLAG (SVG) — рамка и флаг одной формы ===== */
   .flag{
     width: 78px;
     height: 44px;
-    border-radius: 10px;
-    border: 1px solid rgba(8,40,110,.14);
-    background: rgba(31,102,255,.06);
+
+    --r: 10px;
+    border-radius: var(--r);
+    overflow: hidden; /* режет SVG строго по рамке */
+
+    border: 2px solid rgba(8,40,110,.25);
+    background: rgba(255,255,255,.90);
+
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.70),
+      0 6px 16px rgba(8,40,110,.15);
+
     display:flex;
     align-items:center;
     justify-content:center;
-    overflow:hidden;
     user-select:none;
   }
-  .flag svg{ width:100%; height:100%; display:block; }
+  .flag svg{
+    width: 100%;
+    height: 100%;
+    display:block;
+  }
   .flag.na{
     font-weight:700;
     letter-spacing:.14em;
     color: rgba(11,28,51,.55);
-    background: rgba(8,40,110,.06);
+    text-transform: uppercase;
   }
 
   .points{
@@ -374,6 +385,7 @@
     letter-spacing: .06em;
   }
 
+  /* medals */
   .gold  .avatar, .gold  .points{ background: linear-gradient(90deg, var(--gold1), var(--gold2)); }
   .silver .avatar, .silver .points{ background: linear-gradient(90deg, var(--silver1), var(--silver2)); }
   .bronze .avatar, .bronze .points{ background: linear-gradient(90deg, var(--bronze1), var(--bronze2)); }
@@ -382,6 +394,7 @@
   .silver .card{ border-color: rgba(140,140,140,.18); }
   .bronze .card{ border-color: rgba(205,127,50,.18); }
 
+  /* animations */
   .fade-in{ animation: fadeIn .28s ease; }
   @keyframes fadeIn{
     from{ opacity:0; transform: translateY(12px); }
@@ -399,7 +412,7 @@
     transition: transform 520ms cubic-bezier(.2,.9,.2,1);
   }
 
-  /* ===== Tooltip (детали) ===== */
+  /* ===== Tooltip ===== */
   .tooltip{
     position:absolute;
     z-index:50;
@@ -410,7 +423,7 @@
     border: 1px solid rgba(8,40,110,.18);
     box-shadow: 0 18px 60px rgba(8,40,110,.28);
     overflow:hidden;
-    pointer-events:none; /* чтобы не “дергалось” от мыши */
+    pointer-events:none;
     transform: translateY(8px);
     opacity: 0;
     transition: opacity .12s ease, transform .12s ease;
@@ -499,11 +512,11 @@
     <div class="header">
       <div class="titleWrap">
         <div class="title">ЛИЧНЫЙ ЗАЧЁТ</div>
-        <div class="sub"><span class="dot"></span> Top 3 • Live</div>
+        <div class="sub"><span class="dot"></span> Top 3 • Live • Google Sheets</div>
       </div>
 
       <div class="stage">
-        <div class="label">Этап:</div>
+        <div class="label">Статус:</div>
         <div class="val" id="status">подключение…</div>
       </div>
     </div>
@@ -513,7 +526,7 @@
       <div class="rows" id="rows"></div>
     </div>
 
-    <!-- Tooltip для деталей -->
+    <!-- Tooltip -->
     <div class="tooltip" id="tooltip" aria-hidden="true">
       <div class="tt-head">
         <div class="tt-title" id="ttTitle">—</div>
@@ -527,12 +540,12 @@
 </div>
 
 <script>
-  // ====== ТВОЙ GOOGLE SHEETS (опубликованный) ======
+  // ================== GOOGLE SHEETS CONFIG ==================
   const PUB_ID  = "2PACX-1vQvwffbzZpdoLI4y1BoWfRvpeE7l4UYSyIoSj9o27T8N7X-7JqI20EYPCv4hUmaZiP81ST1mhkAPiIp";
-  const GID_TOP3     = "748230739";
-  const GID_DETAILS  = "986522000"; // детали: результаты гонок + машины
+  const GID_TOP3     = "748230739";  // таблица: Место / Пилот / Очки
+  const GID_DETAILS  = "986522000";  // таблица: результаты гонок + машины
   const POLL_MS = 5000;
-  // ================================================
+  // ==========================================================
 
   const BASE_CSV_TOP3   = `https://docs.google.com/spreadsheets/d/e/${PUB_ID}/pub?output=csv&gid=${GID_TOP3}&single=true`;
   const BASE_CSV_DETAIL = `https://docs.google.com/spreadsheets/d/e/${PUB_ID}/pub?output=csv&gid=${GID_DETAILS}&single=true`;
@@ -546,19 +559,19 @@
   const ttCarsEl  = document.getElementById("ttCars");
   const ttBodyEl  = document.getElementById("ttBody");
 
-  // ---- защита от “отката”
+  // ---- Anti rollback (late responses / parallel calls)
   let inFlight = false;
   let reqSeq = 0;
 
-  // ---- анти-дребезг
+  // ---- Anti jitter (apply only stable state)
   let lastState = null;
   let pendingState = null;
   let pendingHits = 0;
   const STABLE_HITS = 2;
 
-  // ---- детали (вторая вкладка)
-  let detailsMap = new Map();      // key: lower(name) -> {cars:Set, fields:[{k,v},...]}
-  let detailsHash = "";            // чтобы не перепарсивать одинаковое
+  // ---- Details cache
+  let detailsMap = new Map(); // lower(name) -> {cars:Set, fields:[{k,v}...]}
+  let detailsHash = "";
 
   function deepCopy(x){ return JSON.parse(JSON.stringify(x)); }
 
@@ -570,7 +583,7 @@
     return true;
   }
 
-  // ===== SVG FLAGS =====
+  // ================== SVG FLAGS ==================
   function svgUA(){
     return `
       <svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg" aria-label="Ukraine">
@@ -579,6 +592,7 @@
       </svg>
     `;
   }
+
   function svgRU(){
     return `
       <svg viewBox="0 0 3 2" xmlns="http://www.w3.org/2000/svg" aria-label="Russia">
@@ -588,16 +602,28 @@
       </svg>
     `;
   }
+
+  // mapping as requested:
+  // Ярик, Хаяши -> UA ; Николас -> RU
   function flagSVGByName(name){
     if (!name) return { html: "—", isNA: true };
     const n = name.toLowerCase();
+
     if (n.includes("ярик"))    return { html: svgUA(), isNA: false };
     if (n.includes("хаяши"))   return { html: svgUA(), isNA: false };
     if (n.includes("николас")) return { html: svgRU(), isNA: false };
+
     return { html: "—", isNA: true };
   }
 
-  // CSV парсер (кавычки/запятые)
+  function updateFlag(rowEl, name){
+    const f = flagSVGByName(name);
+    const flagEl = rowEl.querySelector(".flag");
+    flagEl.classList.toggle("na", !!f.isNA);
+    flagEl.innerHTML = f.html;
+  }
+
+  // ================== CSV PARSER ==================
   function parseCSV(text){
     const rows = [];
     let cur = [], cell = "", inQuotes = false;
@@ -625,7 +651,7 @@
 
   const norm = s => (s || "").trim().toLowerCase();
 
-  // Берём все строки, сортируем по очкам, берём TOP 3
+  // ================== TOP3 EXTRACT ==================
   function extractSortedTop3(csvMatrix){
     if (!csvMatrix.length) return [];
 
@@ -634,7 +660,7 @@
     const idxPoints = header.indexOf("очки");
 
     if (idxName === -1 || idxPoints === -1) {
-      throw new Error("Не найдены столбцы: Пилот / Очки");
+      throw new Error("Не найдены столбцы: Пилот / Очки (в листе Top3)");
     }
 
     const all = csvMatrix.slice(1)
@@ -660,10 +686,18 @@
     return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
   }
 
-  // ===== Детали: разбор вкладки gid=986522000 =====
-  // Поддерживает 2 самых частых формата:
-  // A) "широкий": Пилот | Машина | Гонка1 | Гонка2 | ...
-  // B) "строчный": Пилот | Гонка | Результат | Машина  (может быть много строк на пилота)
+  // ================== DETAILS (gid=986522000) ==================
+  // Supports:
+  // A) wide format: Пилот | Машина | Гонка1 | Гонка2 | ...
+  // B) row format:  Пилот | Гонка | Результат | Машина  (many rows per pilot)
+  function splitCars(text){
+    if (!text) return [];
+    return text
+      .split(/[,;/|]+|\s{2,}/g)
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+
   function buildDetailsMap(matrix){
     const map = new Map();
     if (!matrix || matrix.length < 2) return map;
@@ -671,21 +705,21 @@
     const headerRaw = matrix[0].map(h => (h || "").trim());
     const header = headerRaw.map(norm);
 
-    // индекс пилота
     let idxPilot = header.indexOf("пилот");
     if (idxPilot === -1) idxPilot = header.indexOf("driver");
-    if (idxPilot === -1) idxPilot = 0; // fallback
+    if (idxPilot === -1) idxPilot = 0;
 
-    // возможные колонки
     let idxCar = header.indexOf("машина");
     if (idxCar === -1) idxCar = header.indexOf("car");
+
     let idxRace = header.indexOf("гонка");
     if (idxRace === -1) idxRace = header.indexOf("race");
+
     let idxRes  = header.indexOf("результат");
     if (idxRes === -1) idxRes = header.indexOf("позиция");
     if (idxRes === -1) idxRes = header.indexOf("result");
 
-    const looksRowStyle = (idxRace !== -1 && idxRes !== -1); // формат B
+    const looksRowStyle = (idxRace !== -1 && idxRes !== -1);
 
     for (let r=1; r<matrix.length; r++){
       const row = matrix[r] || [];
@@ -696,12 +730,10 @@
       if (!map.has(key)) map.set(key, { cars: new Set(), fields: [] });
       const item = map.get(key);
 
-      // формат B (много строк)
       if (looksRowStyle){
         const race = String(row[idxRace] ?? "").trim();
         const res  = String(row[idxRes] ?? "").trim();
 
-        // машины могут быть в колонке "машина" или в других — если есть
         if (idxCar !== -1){
           const carCell = String(row[idxCar] ?? "").trim();
           splitCars(carCell).forEach(c => item.cars.add(c));
@@ -710,19 +742,17 @@
         if (race || res){
           item.fields.push({ k: race || "Гонка", v: res || "—" });
         } else {
-          // если вдруг нет гонки/результата — добираем все пары
           for (let c=0; c<headerRaw.length; c++){
             if (c === idxPilot) continue;
             const v = String(row[c] ?? "").trim();
             if (!v) continue;
             const k = headerRaw[c] || `Колонка ${c+1}`;
-            if (norm(k).includes("машина") || norm(k).includes("car")) splitCars(v).forEach(x => item.cars.add(x));
+            const kn = norm(k);
+            if (kn.includes("машина") || kn.includes("car")) splitCars(v).forEach(x => item.cars.add(x));
             else item.fields.push({ k, v });
           }
         }
-
       } else {
-        // формат A (одна строка = один пилот с множеством колонок)
         if (idxCar !== -1){
           const carCell = String(row[idxCar] ?? "").trim();
           splitCars(carCell).forEach(c => item.cars.add(c));
@@ -732,34 +762,20 @@
           if (c === idxPilot) continue;
 
           const kRaw = headerRaw[c] || `Колонка ${c+1}`;
-          const kN = norm(kRaw);
           const v = String(row[c] ?? "").trim();
           if (!v) continue;
 
-          // машины могут лежать не только в "машина"
-          if (kN.includes("машина") || kN.includes("car")) {
-            splitCars(v).forEach(x => item.cars.add(x));
-          } else {
-            item.fields.push({ k: kRaw, v });
-          }
+          const kn = norm(kRaw);
+          if (kn.includes("машина") || kn.includes("car")) splitCars(v).forEach(x => item.cars.add(x));
+          else item.fields.push({ k: kRaw, v });
         }
       }
     }
 
-    // лёгкая чистка: оставим максимум 14 строк, чтобы не раздувать tooltip
-    for (const [k, v] of map.entries()){
+    for (const v of map.values()){
       if (v.fields.length > 14) v.fields = v.fields.slice(0, 14);
     }
-
     return map;
-  }
-
-  function splitCars(text){
-    if (!text) return [];
-    return text
-      .split(/[,;/|]+|\s{2,}/g)
-      .map(s => s.trim())
-      .filter(Boolean);
   }
 
   async function fetchDetails(){
@@ -769,7 +785,6 @@
       if (!res.ok) return;
 
       const text = await res.text();
-      // простой hash — достаточно для “изменилось/нет”
       const h = String(text.length) + ":" + text.slice(0, 64) + ":" + text.slice(-64);
       if (h === detailsHash) return;
 
@@ -777,13 +792,18 @@
       detailsMap = buildDetailsMap(matrix);
       detailsHash = h;
     } catch (e){
-      // детали не критичны
       console.warn("Details fetch error:", e);
     }
   }
 
-  // ===== Tooltip =====
-  let tooltipPinned = false; // для тача: тап = закрепить
+  // ================== TOOLTIP ==================
+  let tooltipPinned = false;
+
+  function escapeHTML(s){
+    return s.replace(/[&<>"']/g, ch => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    }[ch]));
+  }
 
   function renderTooltipForName(name){
     const key = (name || "").toLowerCase();
@@ -817,12 +837,11 @@
     const br = boardEl.getBoundingClientRect();
     const rr = rowEl.getBoundingClientRect();
 
-    // предпочитаем справа от строки, иначе сверху
     const gap = 10;
     const maxW = Math.min(640, br.width - 16);
     tooltipEl.style.maxWidth = maxW + "px";
 
-    // временно “покажем”, чтобы померить размер
+    // show to measure
     tooltipEl.classList.add("show");
     tooltipEl.style.left = "0px";
     tooltipEl.style.top = "0px";
@@ -831,14 +850,11 @@
     let left = rr.right - br.left + gap;
     let top  = rr.top - br.top;
 
-    // если не помещается справа — ставим слева от строки
     if (left + tr.width > br.width - 8) {
       left = rr.left - br.left - tr.width - gap;
     }
-    // если и слева не влезает — центрируем внутри board
     if (left < 8) left = Math.max(8, (br.width - tr.width) / 2);
 
-    // по вертикали: не вылезаем
     if (top + tr.height > br.height - 8) top = br.height - tr.height - 8;
     if (top < 8) top = 8;
 
@@ -870,13 +886,27 @@
     }
   }
 
-  function escapeHTML(s){
-    return s.replace(/[&<>"']/g, ch => ({
-      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
-    }[ch]));
-  }
+  // click empty area to unpin
+  boardEl.addEventListener("mousedown", (e) => {
+    if (e.target.closest(".row")) return;
+    tooltipPinned = false;
+    tooltipEl.classList.remove("show");
+    tooltipEl.setAttribute("aria-hidden", "true");
+    [...rowsEl.children].forEach(r => {
+      r.classList.remove("rowHover");
+      const c = r.querySelector(".card");
+      if (c) c.classList.remove("cardHover");
+    });
+  });
 
-  // FLIP helpers
+  window.addEventListener("resize", () => {
+    if (!tooltipEl.classList.contains("show")) return;
+    const active = [...rowsEl.children].find(r => r.classList.contains("rowHover"));
+    if (!active) return;
+    positionTooltipNearRow(active);
+  });
+
+  // ================== FLIP (animated reorder) ==================
   function snapshotRects(){
     const m = new Map();
     [...rowsEl.children].forEach(el => m.set(el.dataset.key, el.getBoundingClientRect()));
@@ -900,6 +930,45 @@
       el.classList.add("flip");
       el.style.transform = "";
     });
+  }
+
+  function bumpPoints(rowEl){
+    const p = rowEl.querySelector(".points");
+    p.classList.remove("bump");
+    void p.offsetWidth;
+    p.classList.add("bump");
+  }
+
+  // ================== DOM RENDER ==================
+  function bindTooltipEvents(rowEl){
+    const getName = () => (rowEl.querySelector(".name")?.textContent || "").trim();
+
+    rowEl.addEventListener("mouseenter", () => {
+      if (tooltipPinned) return;
+      showTooltip(rowEl, getName());
+    });
+
+    rowEl.addEventListener("mouseleave", () => {
+      hideTooltip(rowEl);
+    });
+
+    rowEl.setAttribute("tabindex", "0");
+    rowEl.addEventListener("focusin", () => {
+      if (tooltipPinned) return;
+      showTooltip(rowEl, getName());
+    });
+    rowEl.addEventListener("focusout", () => {
+      hideTooltip(rowEl);
+    });
+
+    // touch: tap to pin
+    rowEl.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const name = getName();
+      if (!name || name === "—") return;
+      tooltipPinned = true;
+      showTooltip(rowEl, name);
+    }, { passive:false });
   }
 
   function makeRow(item){
@@ -932,84 +1001,8 @@
     el.querySelector(".name").textContent = item.name || "—";
     el.querySelector(".val").textContent = Number.isFinite(item.points) ? item.points : 0;
 
-    // hover/touch events (важно: на создании)
     bindTooltipEvents(el);
-
     return el;
-  }
-
-  function bindTooltipEvents(rowEl){
-    const getName = () => (rowEl.querySelector(".name")?.textContent || "").trim();
-
-    rowEl.addEventListener("mouseenter", () => {
-      if (tooltipPinned) return;
-      showTooltip(rowEl, getName());
-    });
-
-    rowEl.addEventListener("mouseleave", () => {
-      hideTooltip(rowEl);
-    });
-
-    // для клавиатуры
-    rowEl.setAttribute("tabindex", "0");
-    rowEl.addEventListener("focusin", () => {
-      if (tooltipPinned) return;
-      showTooltip(rowEl, getName());
-    });
-    rowEl.addEventListener("focusout", () => {
-      hideTooltip(rowEl);
-    });
-
-    // для тача: тап = закрепить/снять
-    rowEl.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      const name = getName();
-      if (!name || name === "—") return;
-
-      if (!tooltipPinned){
-        tooltipPinned = true;
-        showTooltip(rowEl, name);
-      } else {
-        // если тапнули по другой строке — закрепляем на новой
-        tooltipPinned = true;
-        showTooltip(rowEl, name);
-      }
-    }, { passive:false });
-  }
-
-  // клик по пустому месту — снять закрепление
-  boardEl.addEventListener("mousedown", (e) => {
-    if (e.target.closest(".row")) return;
-    tooltipPinned = false;
-    tooltipEl.classList.remove("show");
-    tooltipEl.setAttribute("aria-hidden", "true");
-    [...rowsEl.children].forEach(r => {
-      r.classList.remove("rowHover");
-      const c = r.querySelector(".card");
-      if (c) c.classList.remove("cardHover");
-    });
-  });
-
-  // если меняется размер окна — перепозиционировать tooltip
-  window.addEventListener("resize", () => {
-    if (!tooltipEl.classList.contains("show")) return;
-    const active = [...rowsEl.children].find(r => r.classList.contains("rowHover"));
-    if (!active) return;
-    positionTooltipNearRow(active);
-  });
-
-  function bumpPoints(rowEl){
-    const p = rowEl.querySelector(".points");
-    p.classList.remove("bump");
-    void p.offsetWidth;
-    p.classList.add("bump");
-  }
-
-  function updateFlag(rowEl, name){
-    const f = flagSVGByName(name);
-    const flagEl = rowEl.querySelector(".flag");
-    flagEl.classList.toggle("na", !!f.isNA);
-    flagEl.innerHTML = f.html;
   }
 
   function renderWithReorder(nextTop3){
@@ -1050,6 +1043,7 @@
     playFLIP(before);
   }
 
+  // ================== APPLY STATE (stable) ==================
   function applyState(state){
     if (sameState(lastState, state)) return;
     lastState = deepCopy(state);
@@ -1083,6 +1077,7 @@
     }
   }
 
+  // ================== TICKERS ==================
   async function tickTop3(){
     if (inFlight) return;
     inFlight = true;
@@ -1093,6 +1088,7 @@
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
+
       if (myReq !== reqSeq) return;
 
       const matrix = parseCSV(text.trim());
@@ -1109,13 +1105,12 @@
   }
 
   async function tickAll(){
-    // обновляем детали параллельно (не блокирует топ-3)
-    fetchDetails();
+    fetchDetails(); // non-blocking
     tickTop3();
   }
 
-  // старт
-  fetchDetails();   // чтобы tooltip сразу имел данные
+  // ================== START ==================
+  fetchDetails(); // load details early for hover
   tickTop3();
   setInterval(tickAll, POLL_MS);
 </script>
