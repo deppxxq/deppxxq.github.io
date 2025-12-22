@@ -326,6 +326,9 @@
 
   // чтобы не "дёргалось" — обновляем DOM только если реально есть изменения
   let lastState = null;
+  let inFlight = false;
+  let reqSeq = 0;
+
 
   function sameState(a, b){
     if (!a || !b || a.length !== b.length) return false;
@@ -483,30 +486,48 @@
     playFLIP(before);
   }
 
-  async function tick(){
-    try{
-      statusEl.textContent = "Online";
+async function tick(){
+  // не запускаем второй запрос, пока идёт первый
+  if (inFlight) return;
+  inFlight = true;
 
-      const res = await fetch(CSV_URL, { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
+  // id этого запроса
+  const myReq = ++reqSeq;
 
-      const matrix = parseCSV(text.trim());
-      const top3 = extractSortedTop3(matrix);
+  try{
+    // cache-busting, чтобы не ловить CDN-кэш Google
+    const url = `${CSV_URL}&_=${Date.now()}`;
 
-      while (top3.length < 3) top3.push({ pos: top3.length+1, name: "—", points: 0 });
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
 
-      // ✅ если ничего не изменилось — НЕ трогаем DOM, поэтому нет дёрганий
-      if (sameState(lastState, top3)) return;
-      lastState = JSON.parse(JSON.stringify(top3));
+    // если пока мы ждали, стартовал новый tick — этот ответ игнорируем
+    if (myReq !== reqSeq) return;
 
-      renderWithReorder(top3);
+    const matrix = parseCSV(text.trim());
+    let top3 = extractSortedTop3(matrix);
+    while (top3.length < 3) top3.push({ pos: top3.length+1, name: "—", points: 0 });
 
-    } catch (e){
-      statusEl.textContent = "Error";
-      console.error(e);
+    // если ничего не изменилось — не трогаем DOM
+    if (sameState(lastState, top3)) {
+      statusEl.textContent = "LIVE";
+      return;
     }
+
+    lastState = JSON.parse(JSON.stringify(top3));
+    statusEl.textContent = "UPDATE";
+    renderWithReorder(top3);
+    setTimeout(() => statusEl.textContent = "LIVE", 350);
+
+  } catch (e){
+    statusEl.textContent = "ERROR";
+    console.error(e);
+  } finally {
+    // снимаем блокировку только если это всё ещё “последний” запрос
+    if (myReq === reqSeq) inFlight = false;
   }
+}
 
   tick();
   setInterval(tick, POLL_MS);
