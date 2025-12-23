@@ -11,17 +11,19 @@
 
 <style>
   :root{
+    /* === BLUE + WHITE THEME === */
     --bgA:#071a33;
     --bgB:#f4f8ff;
-
     --accent:#1f66ff;
     --accentSoft:#7fb2ff;
 
     --panel2: rgba(245,248,255,.90);
+    --stroke: rgba(8,40,110,.14);
 
     --text:#0b1c33;
     --muted:#4a5f85;
 
+    /* medals */
     --gold1:#b8860b; --gold2:#ffd700;
     --silver1:#8b8b8b; --silver2:#d7d7d7;
     --bronze1:#7a3d12; --bronze2:#cd7f32;
@@ -201,6 +203,7 @@
     will-change: transform;
   }
 
+  /* hover highlight */
   .rowHover{
     filter: drop-shadow(0 10px 18px rgba(8,40,110,.18));
   }
@@ -314,9 +317,7 @@
     background: rgba(31,102,255,.55);
   }
 
-  /* ====== FLAG: FULL SIZE + SAME ROUNDED SHAPE AS FRAME ======
-     SVG fills 100%, frame drawn on top via ::after (does not shrink flag).
-  */
+  /* ===== FLAG (SVG) — рамка и флаг одной формы ===== */
   .flag{
     width: 78px;
     height: 44px;
@@ -325,15 +326,16 @@
     border-radius: var(--r);
     overflow: hidden;
 
-    border: 0;
-    position: relative;
+    border: 2px solid rgba(8,40,110,.25);
+    background: rgba(255,255,255,.90);
+
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,.70),
+      0 6px 16px rgba(8,40,110,.15);
 
     display:flex;
-    align-items:stretch;
-    justify-content:stretch;
-
-    background: transparent;
-    box-shadow: none;
+    align-items:center;
+    justify-content:center;
     user-select:none;
   }
   .flag svg{
@@ -342,25 +344,10 @@
     display:block;
   }
   .flag.na{
-    background: rgba(255,255,255,.85);
-    color: rgba(11,28,51,.55);
     font-weight:700;
     letter-spacing:.14em;
+    color: rgba(11,28,51,.55);
     text-transform: uppercase;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .flag::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius: var(--r);
-    pointer-events:none;
-    box-shadow:
-      inset 0 0 0 2px rgba(8,40,110,.25),
-      inset 0 0 0 4px rgba(255,255,255,.75),
-      0 6px 16px rgba(8,40,110,.15);
   }
 
   .points{
@@ -397,6 +384,7 @@
     letter-spacing: .06em;
   }
 
+  /* medals */
   .gold  .avatar, .gold  .points{ background: linear-gradient(90deg, var(--gold1), var(--gold2)); }
   .silver .avatar, .silver .points{ background: linear-gradient(90deg, var(--silver1), var(--silver2)); }
   .bronze .avatar, .bronze .points{ background: linear-gradient(90deg, var(--bronze1), var(--bronze2)); }
@@ -405,6 +393,7 @@
   .silver .card{ border-color: rgba(140,140,140,.18); }
   .bronze .card{ border-color: rgba(205,127,50,.18); }
 
+  /* animations */
   .fade-in{ animation: fadeIn .28s ease; }
   @keyframes fadeIn{
     from{ opacity:0; transform: translateY(12px); }
@@ -427,7 +416,7 @@
     position:absolute;
     z-index:50;
     min-width: 520px;
-    max-width: min(840px, 92vw);
+    max-width: min(860px, 94vw);
     border-radius: 14px;
     background: rgba(245,248,255,.96);
     border: 1px solid rgba(8,40,110,.18);
@@ -462,11 +451,26 @@
     text-overflow:ellipsis;
     white-space:nowrap;
   }
+  .tt-sub{
+    font-weight: 700;
+    color: rgba(11,28,51,.70);
+    letter-spacing:.10em;
+    text-transform: uppercase;
+    font-size: 12px;
+    white-space:nowrap;
+  }
   .tt-body{
     padding: 12px 14px 14px;
   }
+  .tt-empty{
+    color: rgba(11,28,51,.60);
+    font-weight: 700;
+    letter-spacing:.08em;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
 
-  /* ===== Tooltip table (Race | Place | Track | Car) ===== */
+  /* Tooltip table */
   .tt-table{
     width: 100%;
     border-collapse: separate;
@@ -476,7 +480,6 @@
     border: 1px solid rgba(8,40,110,.14);
     background: rgba(255,255,255,.70);
   }
-
   .tt-table thead th{
     text-align:left;
     font-weight: 700;
@@ -489,7 +492,6 @@
     border-bottom: 1px solid rgba(8,40,110,.12);
     white-space: nowrap;
   }
-
   .tt-table tbody td{
     padding: 10px 10px;
     border-bottom: 1px solid rgba(8,40,110,.10);
@@ -498,14 +500,12 @@
     font-size: 13px;
     vertical-align: middle;
   }
+  .tt-table tbody tr:last-child td{
+    border-bottom: none;
+  }
+  .tt-col-place{ width: 84px; text-align:center; }
 
-  .tt-table tbody tr:last-child td{ border-bottom: none; }
-
-  .tt-col-place{ width: 74px; text-align:center; }
-  .tt-col-race{ width: 28%; }
-  .tt-col-track{ width: 32%; }
-  .tt-col-car{ width: auto; }
-
+  /* place pill + medal highlight */
   .place-pill{
     display:inline-flex;
     align-items:center;
@@ -537,21 +537,17 @@
     box-shadow: 0 8px 18px rgba(205,127,50,.14);
   }
 
-  .tt-empty{
-    color: rgba(11,28,51,.60);
-    font-weight: 700;
-    letter-spacing:.08em;
-    text-transform: uppercase;
-    font-size: 12px;
+  @media (max-width: 900px){
+    .tooltip{ min-width: min(560px, 94vw); }
   }
-
   @media (max-width: 760px){
     .row{ grid-template-columns: 70px 1fr 130px; }
     .card{ grid-template-columns: 72px 1fr 70px; }
     .avatar{ width: 62px; height: 62px; border-radius: 10px; }
     .flag{ width: 64px; height: 40px; }
-    .tooltip{ min-width: min(380px, 92vw); }
-    .tt-col-track{ display:none; }
+    .tooltip{ min-width: min(520px, 94vw); }
+    .tt-table thead th{ font-size: 11px; padding: 9px 8px; }
+    .tt-table tbody td{ font-size: 12px; padding: 9px 8px; }
   }
 </style>
 </head>
@@ -582,6 +578,7 @@
     <div class="tooltip" id="tooltip" aria-hidden="true">
       <div class="tt-head">
         <div class="tt-title" id="ttTitle">—</div>
+        <div class="tt-sub" id="ttSub">Гонка | Место | Трасса | Машина</div>
       </div>
       <div class="tt-body" id="ttBody">
         <div class="tt-empty">Нет данных</div>
@@ -593,8 +590,8 @@
 <script>
   // ================== GOOGLE SHEETS CONFIG ==================
   const PUB_ID  = "2PACX-1vQvwffbzZpdoLI4y1BoWfRvpeE7l4UYSyIoSj9o27T8N7X-7JqI20EYPCv4hUmaZiP81ST1mhkAPiIp";
-  const GID_TOP3     = "748230739";  // Пилот | Очки
-  const GID_DETAILS  = "986522000";  // Пилот | Гонка | Место | Трасса | Машина
+  const GID_TOP3     = "748230739";  // таблица: Место / Пилот / Очки
+  const GID_DETAILS  = "986522000";  // таблица: Пилот + ГП1..ГПn, ниже строки Машины/Трасса
   const POLL_MS = 5000;
   // ==========================================================
 
@@ -609,17 +606,18 @@
   const ttTitleEl = document.getElementById("ttTitle");
   const ttBodyEl  = document.getElementById("ttBody");
 
-  // ---- Anti rollback
+  // ---- Anti rollback (late responses / parallel calls)
   let inFlight = false;
   let reqSeq = 0;
 
-  // ---- Anti jitter
+  // ---- Anti jitter (apply only stable state)
   let lastState = null;
   let pendingState = null;
   let pendingHits = 0;
   const STABLE_HITS = 2;
 
-  // ---- Details cache
+  // ---- Details cache (WIDE format)
+  // detailsMap: lower(pilot) -> [{race, place, track, car}, ...]
   let detailsMap = new Map();
   let detailsHash = "";
 
@@ -653,12 +651,16 @@
     `;
   }
 
+  // mapping as requested:
+  // Ярик, Хаяши -> UA ; Николас -> RU
   function flagSVGByName(name){
     if (!name) return { html: "—", isNA: true };
     const n = name.toLowerCase();
+
     if (n.includes("ярик"))    return { html: svgUA(), isNA: false };
     if (n.includes("хаяши"))   return { html: svgUA(), isNA: false };
     if (n.includes("николас")) return { html: svgRU(), isNA: false };
+
     return { html: "—", isNA: true };
   }
 
@@ -666,7 +668,7 @@
     const f = flagSVGByName(name);
     const flagEl = rowEl.querySelector(".flag");
     flagEl.classList.toggle("na", !!f.isNA);
-    flagEl.innerHTML = f.isNA ? "—" : f.html;
+    flagEl.innerHTML = f.html;
   }
 
   // ================== CSV PARSER ==================
@@ -704,7 +706,10 @@
     const header = csvMatrix[0].map(norm);
     const idxName   = header.indexOf("пилот");
     const idxPoints = header.indexOf("очки");
-    if (idxName === -1 || idxPoints === -1) throw new Error("Не найдены столбцы: Пилот / Очки");
+
+    if (idxName === -1 || idxPoints === -1) {
+      throw new Error("Не найдены столбцы: Пилот / Очки (в листе Top3)");
+    }
 
     const all = csvMatrix.slice(1)
       .filter(r => r && r.length)
@@ -718,7 +723,9 @@
     return all.slice(0,3).map((r, i) => ({ pos: i+1, ...r }));
   }
 
-  function themeByPos(pos){ return pos === 1 ? "gold" : (pos === 2 ? "silver" : "bronze"); }
+  function themeByPos(pos){
+    return pos === 1 ? "gold" : (pos === 2 ? "silver" : "bronze");
+  }
 
   function initials(name){
     const parts = (name || "").trim().split(/\s+/).filter(Boolean);
@@ -727,49 +734,54 @@
     return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
   }
 
-  // ================== DETAILS STRICT TABLE ==================
-  function pickIndex(headerLowerArr, variants, fallback){
-    for (const v of variants){
-      const i = headerLowerArr.indexOf(v);
-      if (i !== -1) return i;
-    }
-    return fallback;
-  }
-
+  // ================== DETAILS (WIDE FORMAT as on your screenshot) ==================
+  // matrix[0] : "Пилот", "ГП 1", "ГП 2", ...
+  // rows 1.. : pilots (first col = pilot name, then places per GP)
+  // somewhere below exist rows with first col "Машины" and "Трасса" with values per GP
   function buildDetailsMap(matrix){
     const map = new Map();
     if (!matrix || matrix.length < 2) return map;
 
-    const headerRaw = matrix[0].map(h => (h || "").trim());
-    const header = headerRaw.map(norm);
+    const header = (matrix[0] || []).map(x => (x || "").trim()); // race names by column
 
-    const idxPilot = pickIndex(header, ["пилот","driver"], 0);
-    const idxRace  = pickIndex(header, ["гонка","race"], -1);
-    const idxPlace = pickIndex(header, ["место","позиция","результат","place","position","result"], -1);
-    const idxTrack = pickIndex(header, ["трасса","трек","track","circuit"], -1);
-    const idxCar   = pickIndex(header, ["машина","car"], -1);
+    let carsRow = null;
+    let tracksRow = null;
 
-    for (let r=1; r<matrix.length; r++){
-      const row = matrix[r] || [];
-      const pilot = String(row[idxPilot] ?? "").trim();
+    for (let i = 1; i < matrix.length; i++){
+      const label = String((matrix[i] || [])[0] || "").trim().toLowerCase();
+      if (!label) continue;
+      if (label.includes("машин")) carsRow = matrix[i];
+      if (label.includes("трас"))  tracksRow = matrix[i];
+    }
+
+    for (let r = 1; r < matrix.length; r++){
+      const pilot = String((matrix[r] || [])[0] || "").trim();
       if (!pilot) continue;
-      const key = pilot.toLowerCase();
 
-      if (!map.has(key)) map.set(key, { rows: [] });
-      const item = map.get(key);
+      const low = pilot.toLowerCase();
+      if (low.includes("машин") || low.includes("трас")) continue;
 
-      const race  = idxRace  !== -1 ? String(row[idxRace]  ?? "").trim() : "";
-      const place = idxPlace !== -1 ? String(row[idxPlace] ?? "").trim() : "";
-      const track = idxTrack !== -1 ? String(row[idxTrack] ?? "").trim() : "";
-      const car   = idxCar   !== -1 ? String(row[idxCar]   ?? "").trim() : "";
+      const rows = [];
 
-      if (!race && !place && !track && !car) continue;
-      item.rows.push({ race, place, track, car });
+      for (let c = 1; c < header.length; c++){
+        const raceName = header[c];
+        if (!raceName) continue;
+
+        const placeRaw = String((matrix[r] || [])[c] || "").trim();
+        if (!placeRaw) continue;
+
+        const place = parseInt(placeRaw, 10);
+        if (![1,2,3].includes(place)) continue;
+
+        const car   = carsRow   ? String(carsRow[c]   || "").trim() : "—";
+        const track = tracksRow ? String(tracksRow[c] || "").trim() : "—";
+
+        rows.push({ race: raceName, place, track, car });
+      }
+
+      if (rows.length) map.set(pilot.toLowerCase(), rows);
     }
 
-    for (const v of map.values()){
-      if (v.rows.length > 20) v.rows = v.rows.slice(0, 20);
-    }
     return map;
   }
 
@@ -791,59 +803,51 @@
     }
   }
 
-  // ================== TOOLTIP TABLE ==================
+  // ================== TOOLTIP (TABLE: Race | Place | Track | Car) ==================
   let tooltipPinned = false;
 
   function escapeHTML(s){
-    return s.replace(/[&<>"']/g, ch => ({
+    return String(s).replace(/[&<>"']/g, ch => ({
       "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
     }[ch]));
   }
 
-  function parsePlace(v){
-    const n = parseInt(String(v || "").replace(/[^\d]/g,""), 10);
-    return Number.isFinite(n) ? n : null;
-  }
-
   function renderTooltipForName(name){
-    const key = (name || "").toLowerCase();
-    const d = detailsMap.get(key);
-
+    const data = detailsMap.get((name || "").toLowerCase());
     ttTitleEl.textContent = name || "—";
 
-    if (!d || !d.rows || !d.rows.length){
-      ttBodyEl.innerHTML = `<div class="tt-empty">Нет данных (лист деталей)</div>`;
+    if (!data || !data.length){
+      ttBodyEl.innerHTML = `<div class="tt-empty">Нет данных</div>`;
       return;
     }
 
-    const rowsHtml = d.rows.map(r => {
-      const p = parsePlace(r.place);
-      const cls = (p === 1 ? "place-1" : (p === 2 ? "place-2" : (p === 3 ? "place-3" : "")));
-      const pill = `<span class="place-pill ${cls}">${escapeHTML(r.place || "—")}</span>`;
+    const rowsHtml = data.map(r => {
+      const cls =
+        r.place === 1 ? "place-1" :
+        r.place === 2 ? "place-2" :
+        r.place === 3 ? "place-3" : "";
 
       return `
         <tr>
-          <td class="tt-col-race">${escapeHTML(r.race || "—")}</td>
-          <td class="tt-col-place">${pill}</td>
-          <td class="tt-col-track">${escapeHTML(r.track || "—")}</td>
-          <td class="tt-col-car">${escapeHTML(r.car || "—")}</td>
+          <td>${escapeHTML(r.race)}</td>
+          <td class="tt-col-place"><span class="place-pill ${cls}">${r.place}</span></td>
+          <td>${escapeHTML(r.track || "—")}</td>
+          <td>${escapeHTML(r.car || "—")}</td>
         </tr>
       `;
     }).join("");
 
     ttBodyEl.innerHTML = `
-      <table class="tt-table" role="table" aria-label="Результаты гонок">
+      <table class="tt-table" aria-label="Результаты гонок">
         <thead>
           <tr>
-            <th class="tt-col-race">Гонка</th>
+            <th>Гонка</th>
             <th class="tt-col-place">Место</th>
-            <th class="tt-col-track">Трасса</th>
-            <th class="tt-col-car">Машина</th>
+            <th>Трасса</th>
+            <th>Машина</th>
           </tr>
         </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
+        <tbody>${rowsHtml}</tbody>
       </table>
     `;
   }
@@ -851,6 +855,7 @@
   function positionTooltipNearRow(rowEl){
     const br = boardEl.getBoundingClientRect();
     const rr = rowEl.getBoundingClientRect();
+
     const gap = 10;
 
     tooltipEl.classList.add("show");
@@ -861,7 +866,9 @@
     let left = rr.right - br.left + gap;
     let top  = rr.top - br.top;
 
-    if (left + tr.width > br.width - 8) left = rr.left - br.left - tr.width - gap;
+    if (left + tr.width > br.width - 8) {
+      left = rr.left - br.left - tr.width - gap;
+    }
     if (left < 8) left = Math.max(8, (br.width - tr.width) / 2);
 
     if (top + tr.height > br.height - 8) top = br.height - tr.height - 8;
@@ -914,7 +921,7 @@
     positionTooltipNearRow(active);
   });
 
-  // ================== FLIP (reorder animation) ==================
+  // ================== FLIP (animated reorder) ==================
   function snapshotRects(){
     const m = new Map();
     [...rowsEl.children].forEach(el => m.set(el.dataset.key, el.getBoundingClientRect()));
@@ -969,7 +976,6 @@
       hideTooltip(rowEl);
     });
 
-    // touch: tap to pin
     rowEl.addEventListener("touchstart", (e) => {
       e.preventDefault();
       const name = getName();
@@ -997,7 +1003,7 @@
           <div class="meta"><span class="bar"></span><span>Пилот</span></div>
         </div>
 
-        <div class="flag ${f.isNA ? "na" : ""}">${f.isNA ? "—" : f.html}</div>
+        <div class="flag ${f.isNA ? "na" : ""}">${f.html}</div>
       </div>
 
       <div class="points">
